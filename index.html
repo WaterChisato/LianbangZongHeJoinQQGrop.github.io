@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>联邦综合 跳转工具</title>
+  <title>联邦综合随机链接跳转工具</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
   
@@ -42,6 +42,13 @@
       .bg-gradient-soft {
         background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
       }
+      .pulse-animation {
+        animation: pulse 1.5s infinite;
+      }
+      @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.7; }
+      }
     }
   </style>
 </head>
@@ -52,57 +59,83 @@
       <div class="absolute -top-10 -right-10 w-40 h-40 bg-accent/20 rounded-full filter blur-3xl"></div>
       <div class="absolute -bottom-10 -left-10 w-40 h-40 bg-secondary/20 rounded-full filter blur-3xl"></div>
       <div class="relative h-full flex items-center justify-center">
-        <i class="fa fa-link text-4xl text-white"></i>
+        <i class="fa fa-random text-4xl text-white"></i>
       </div>
     </div>
     
     <!-- 内容区域 -->
     <div class="p-8 text-center">
-      <h1 class="text-[clamp(1.5rem,3vw,2rem)] font-bold mb-2">链接跳转工具</h1>
-      <p class="text-gray-600 mb-8">点击下方按钮，快速跳转到目标链接</p>
+      <h1 class="text-[clamp(1.5rem,3vw,2rem)] font-bold mb-2">联邦综合随机链接跳转</h1>
+      <p class="text-gray-600 mb-6">每次点击将从4个链接中随机选择一个跳转</p>
+      
+      <!-- 链接预览区域 -->
+      <div id="linkPreview" class="bg-gray-50 rounded-lg p-4 mb-8 text-sm text-gray-700">
+        <i class="fa fa-link text-primary mr-2"></i>
+        <span>准备随机选择链接...</span>
+      </div>
       
       <!-- 主要按钮 -->
       <button id="redirectBtn" class="w-full py-4 px-6 bg-primary text-white font-semibold rounded-lg btn-shadow transform transition-all duration-300 hover:btn-hover active:scale-95 flex items-center justify-center gap-2">
-        <span>立即跳转</span>
-        <i class="fa fa-arrow-right"></i>
+        <span>获取随机链接</span>
+        <i class="fa fa-random"></i>
       </button>
       
-      <!-- 状态提示 -->
-      <div id="statusMsg" class="mt-6 text-sm text-gray-500 hidden">
-        <i class="fa fa-info-circle text-primary mr-2"></i>
-        <span>准备跳转到目标链接...</span>
+      <!-- 加载状态 -->
+      <div id="loadingState" class="mt-6 hidden items-center justify-center gap-2">
+        <div class="w-5 h-5 rounded-full bg-primary pulse-animation"></div>
+        <div class="w-5 h-5 rounded-full bg-primary pulse-animation" style="animation-delay: 0.2s"></div>
+        <div class="w-5 h-5 rounded-full bg-primary pulse-animation" style="animation-delay: 0.4s"></div>
       </div>
     </div>
   </div>
 
   <script>
-    // 目标跳转链接 - 请修改为你需要的链接
-    const targetUrl = 'https://qm.qq.com/q/tYOvpw2jss';
+    // 待随机选择的链接数组 - 请修改为你需要的链接
+    const linkArray = [
+      'https://qm.qq.com/q/md2C7mt9ao',
+      'https://pd.qq.com/s/addrhadcg?b=9',
+      'http://waterchisato.github.io',
+      'https://qm.qq.com/q/aR0XPvT1Vm'
+    ];
     
     // 获取DOM元素
     const redirectBtn = document.getElementById('redirectBtn');
-    const statusMsg = document.getElementById('statusMsg');
+    const linkPreview = document.getElementById('linkPreview');
+    const loadingState = document.getElementById('loadingState');
     
-    // 按钮点击事件
-    redirectBtn.addEventListener('click', function() {
-      // 显示状态提示
-      statusMsg.classList.remove('hidden');
+    // 随机选择链接并跳转
+    function redirectToRandomLink() {
+      // 生成0-3的随机索引
+      const randomIndex = Math.floor(Math.random() * linkArray.length);
+      const randomLink = linkArray[randomIndex];
+      
+      // 更新预览文本
+      linkPreview.innerHTML = `
+        <i class="fa fa-link text-primary mr-2"></i>
+        <span>即将跳转到: ${randomLink}</span>
+      `;
+      
+      // 显示加载状态
+      loadingState.classList.remove('hidden');
       redirectBtn.disabled = true;
       redirectBtn.classList.add('opacity-70', 'cursor-not-allowed');
       
-      // 添加点击动画效果
-      this.classList.add('scale-95');
+      // 添加加载动画效果
+      redirectBtn.classList.add('scale-95');
       setTimeout(() => {
-        this.classList.remove('scale-95');
+        redirectBtn.classList.remove('scale-95');
       }, 200);
       
-      // 模拟加载延迟，增强用户体验
+      // 模拟加载延迟后跳转
       setTimeout(() => {
-        window.location.href = targetUrl;
-      }, 800);
-    });
+        window.location.href = randomLink;
+      }, 1200);
+    }
     
-    // 添加页面加载动画
+    // 按钮点击事件
+    redirectBtn.addEventListener('click', redirectToRandomLink);
+    
+    // 页面加载动画
     document.addEventListener('DOMContentLoaded', function() {
       const container = document.querySelector('.max-w-md');
       container.classList.add('opacity-0', 'translate-y-4');
