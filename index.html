@@ -1,150 +1,93 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>联邦综合随机链接跳转工具</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
-  
-  <!-- 配置Tailwind自定义样式 -->
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            primary: '#3B82F6',
-            secondary: '#10B981',
-            accent: '#8B5CF6',
-            dark: '#1F2937',
-            light: '#F9FAFB'
-          },
-          fontFamily: {
-            inter: ['Inter', 'system-ui', 'sans-serif'],
-          },
-        },
-      }
-    }
-  </script>
-  
-  <style type="text/tailwindcss">
-    @layer utilities {
-      .content-auto {
-        content-visibility: auto;
-      }
-      .btn-shadow {
-        box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.3), 0 8px 10px -6px rgba(59, 130, 246, 0.2);
-      }
-      .btn-hover {
-        transform: translateY(-2px);
-        box-shadow: 0 15px 30px -5px rgba(59, 130, 246, 0.4), 0 10px 15px -5px rgba(59, 130, 246, 0.3);
-      }
-      .bg-gradient-soft {
-        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-      }
-      .pulse-animation {
-        animation: pulse 1.5s infinite;
-      }
-      @keyframes pulse {
-        0%, 100% { opacity: 1; }
-        50% { opacity: 0.7; }
-      }
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>联邦综合随机跳转工具</title>
+    
+    <!-- 任务栏图标配置 -->
+    <link rel="icon" href="favicon.ico" type="image/x-icon">           <!-- 标准图标 -->
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon"> <!-- 兼容旧浏览器 -->
+    <link rel="icon" href="logo-16.png" sizes="16x16" type="image/png">   <!-- 16px图标 -->
+    <link rel="icon" href="logo-32.png" sizes="32x32" type="image/png">   <!-- 32px图标 -->
+    <link rel="icon" href="logo-64.png" sizes="64x64" type="image/png">   <!-- 64px图标 -->
+    
+    <style>
+        /* 精简界面样式 */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #f5f5f5;
+        }
+        .container {
+            text-align: center;
+            padding: 30px 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            max-width: 400px;
+            width: 90%;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 22px;
+        }
+        button {
+            padding: 12px 30px;
+            background-color: #409EFF;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        button:hover {
+            background-color: #3083e0;
+        }
+        .footer {
+            margin-top: 40px;
+            font-size: 14px;
+            color: #666;
+            width: 100%;
+            text-align: center;
+            padding: 15px 0;
+            border-top: 1px solid #eee;
+        }
+    </style>
 </head>
-<body class="font-inter bg-gradient-soft min-h-screen flex items-center justify-center p-4 text-dark">
-  <div class="max-w-md w-full bg-white rounded-2xl shadow-xl overflow-hidden transform transition-all duration-500 hover:shadow-2xl">
-    <!-- 顶部装饰 -->
-    <div class="h-32 bg-primary relative overflow-hidden">
-      <div class="absolute -top-10 -right-10 w-40 h-40 bg-accent/20 rounded-full filter blur-3xl"></div>
-      <div class="absolute -bottom-10 -left-10 w-40 h-40 bg-secondary/20 rounded-full filter blur-3xl"></div>
-      <div class="relative h-full flex items-center justify-center">
-        <i class="fa fa-random text-4xl text-white"></i>
-      </div>
+<body>
+    <div class="container">
+        <h1>点击按钮随机跳转联邦综合的群聊</h1>
+        <button id="jumpButton">立即跳转</button>
     </div>
-    
-    <!-- 内容区域 -->
-    <div class="p-8 text-center">
-      <h1 class="text-[clamp(1.5rem,3vw,2rem)] font-bold mb-2">联邦综合随机链接跳转</h1>
-      <p class="text-gray-600 mb-6">每次点击将从4个链接中随机选择一个跳转</p>
-      
-      <!-- 链接预览区域 -->
-      <div id="linkPreview" class="bg-gray-50 rounded-lg p-4 mb-8 text-sm text-gray-700">
-        <i class="fa fa-link text-primary mr-2"></i>
-        <span>准备随机选择链接...</span>
-      </div>
-      
-      <!-- 主要按钮 -->
-      <button id="redirectBtn" class="w-full py-4 px-6 bg-primary text-white font-semibold rounded-lg btn-shadow transform transition-all duration-300 hover:btn-hover active:scale-95 flex items-center justify-center gap-2">
-        <span>获取随机链接</span>
-        <i class="fa fa-random"></i>
-      </button>
-      
-      <!-- 加载状态 -->
-      <div id="loadingState" class="mt-6 hidden items-center justify-center gap-2">
-        <div class="w-5 h-5 rounded-full bg-primary pulse-animation"></div>
-        <div class="w-5 h-5 rounded-full bg-primary pulse-animation" style="animation-delay: 0.2s"></div>
-        <div class="w-5 h-5 rounded-full bg-primary pulse-animation" style="animation-delay: 0.4s"></div>
-      </div>
-    </div>
-  </div>
+    <div class="footer">水喝千束  X  联邦综合</div> <!-- 底部固定文字 -->
 
-  <script>
-    // 待随机选择的链接数组 - 请修改为你需要的链接
-    const linkArray = [
-      'https://qm.qq.com/q/md2C7mt9ao',
-      'https://pd.qq.com/s/addrhadcg?b=9',
-      'https://waterchisato.github.io/LianbangZongHeJoinQQGrop.github.io/',
-      'https://qm.qq.com/q/aR0XPvT1Vm'
-    ];
-    
-    // 获取DOM元素
-    const redirectBtn = document.getElementById('redirectBtn');
-    const linkPreview = document.getElementById('linkPreview');
-    const loadingState = document.getElementById('loadingState');
-    
-    // 随机选择链接并跳转
-    function redirectToRandomLink() {
-      // 生成0-3的随机索引
-      const randomIndex = Math.floor(Math.random() * linkArray.length);
-      const randomLink = linkArray[randomIndex];
-      
-      // 更新预览文本
-      linkPreview.innerHTML = `
-        <i class="fa fa-link text-primary mr-2"></i>
-        <span>即将跳转到: ${randomLink}</span>
-      `;
-      
-      // 显示加载状态
-      loadingState.classList.remove('hidden');
-      redirectBtn.disabled = true;
-      redirectBtn.classList.add('opacity-70', 'cursor-not-allowed');
-      
-      // 添加加载动画效果
-      redirectBtn.classList.add('scale-95');
-      setTimeout(() => {
-        redirectBtn.classList.remove('scale-95');
-      }, 200);
-      
-      // 模拟加载延迟后跳转
-      setTimeout(() => {
-        window.location.href = randomLink;
-      }, 1200);
-    }
-    
-    // 按钮点击事件
-    redirectBtn.addEventListener('click', redirectToRandomLink);
-    
-    // 页面加载动画
-    document.addEventListener('DOMContentLoaded', function() {
-      const container = document.querySelector('.max-w-md');
-      container.classList.add('opacity-0', 'translate-y-4');
-      
-      setTimeout(() => {
-        container.classList.remove('opacity-0', 'translate-y-4');
-        container.classList.add('opacity-100', 'translate-y-0');
-      }, 100);
-    });
-  </script>
+    <script>
+        // 配置4个待跳转链接（需替换为实际链接）
+        const jumpLinks = [
+            'https://qm.qq.com/q/fzEFhyq1eE', // 链接1
+            'https://pd.qq.com/s/8gggjkgf2?b=9', // 链接2
+            'https://qm.qq.com/q/m80HquL9Qu', // 链接3
+            'https://discord.gg/GraDEVwGcJ'  // 链接4
+        ];
+
+        // 初始化页面
+        document.addEventListener('DOMContentLoaded', function() {
+            const button = document.getElementById('jumpButton');
+            
+            // 绑定点击事件（随机跳转4个链接之一）
+            button.addEventListener('click', function() {
+                const randomIndex = Math.floor(Math.random() * jumpLinks.length);
+                window.location.href = jumpLinks[randomIndex];
+            });
+        });
+    </script>
 </body>
 </html>
